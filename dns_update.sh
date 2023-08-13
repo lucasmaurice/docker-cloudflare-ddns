@@ -78,7 +78,7 @@ echo "Public IP: ${IPS[0]}"
 if $(echo $CHANGE_RETURN | jq .success);
 then
   echo "DNS updated successfully."
-  curl https://api.pushover.net/1/messages.json \
+  curl -s https://api.pushover.net/1/messages.json \
     --form-string "token=$PO_TOKEN" \
     --form-string "user=$PO_USERKEY" \
     --form-string "title=Home public IP updated!" \
@@ -89,7 +89,7 @@ else
   echo $CHANGE_RETURN | jq .errors[].message
   MESSAGE="DNS update failed from $RECORD_IP to ${IPS[0]}. Errors:
 $(echo $CHANGE_RETURN | jq .errors[].message)"
-  curl https://api.pushover.net/1/messages.json \
+  curl -s https://api.pushover.net/1/messages.json \
     --form-string "token=$PO_TOKEN" \
     --form-string "user=$PO_USERKEY" \
     --form-string "title=Home public IP update failed!" \
