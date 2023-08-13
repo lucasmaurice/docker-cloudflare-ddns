@@ -40,9 +40,25 @@ for (( i=1; i<${#IPS[@]}; i++ )); do
 done
 
 # Check the current DNS record using the cloudflare API
-RECORD_IP=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE/dns_records/$CF_ENTRY" \
+RECORD_RESPONSE=$(curl -sX GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE/dns_records/$CF_ENTRY" \
      -H "Authorization: Bearer $CF_TOKEN" \
-     -H "Content-Type:application/json" | jq -r .result.content)
+     -H "Content-Type:application/json")
+
+if ! $(echo $RECORD_RESPONSE | jq .success);
+then
+  echo "Error getting DNS record. See below:"
+  echo $RECORD_RESPONSE | jq .errors[].message
+  MESSAGE="Error getting DNS record. Errors:
+$(echo $CHANGE_RETURN | jq .errors[].message)"
+  curl -s https://api.pushover.net/1/messages.json \
+    --form-string "token=$PO_TOKEN" \
+    --form-string "user=$PO_USERKEY" \
+    --form-string "title=Failure reading Cloudflare entries!" \
+    --form-string "priority=1"
+  exit 1
+fi
+
+RECORD_IP=$(echo $RECORD_RESPONSE | jq -r .result.content)
 
 # If the public IP and the DNS record IP are the same, we don't need to do anything
 if [ "${IPS[0]}" == "$RECORD_IP" ]; then
