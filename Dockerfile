@@ -1,9 +1,9 @@
 FROM alpine:latest
 
-RUN apk update
-RUN apk add --no-cache bash curl jq
+LABEL org.opencontainers.image.source="https://github.com/lucasmaurice/docker-cloudflare-ddns"
 
-# Clean up
+RUN apk update && apk upgrade
+RUN apk add --no-cache bash curl jq
 RUN rm -rf /var/cache/apk/*
 
 # Import the script from the host
