@@ -1,4 +1,4 @@
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 
 LABEL org.opencontainers.image.source="https://github.com/lucasmaurice/docker-cloudflare-ddns"
 
